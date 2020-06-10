@@ -1,0 +1,75 @@
+interface Node {
+    id: ID!
+    name: String!
+}
+
+enum PokemonType {
+    GRASS
+    WATER
+    FIRE
+    ICE
+    ELECTRIC
+    PSYCHIC
+}
+
+type Pokemon implements Node {
+    id: ID!
+    name: String!
+    type: [PokemonType!]!
+    hp: Int!
+}
+
+type Trainer implements Node {
+    id: ID!
+    name: String!
+    hometown: String!
+}
+
+union Character = Pokemon | Trainer
+
+enum PotionType {
+    HEALTH
+    ENERGY
+}
+
+type Potion implements Node {
+    id: ID!
+    name: String!
+    potionType: PotionType!
+}
+
+enum BallType {
+    NORMAL
+    MASTER
+}
+
+type Pokeball implements Node {
+    id: ID!
+    name: String!
+    count: Int!
+    ballType: BallType!
+}
+
+union InventoryItem = Pokeball | Potion
+
+type Pokedex {
+    lastSeenPokemon: Pokemon
+    totalSeenPokemon: Int!
+    items: [InventoryItem!]!
+}
+
+type Query {
+    pokedex: Pokedex
+    characters: [Character!]!
+    pokemon(type: PokemonType): [Pokemon!]!
+}
+
+input SetPokemonFields {
+    name: String
+    type: [PokemonType!]
+    hp: Int
+}
+
+type Mutation {
+    updatePokemon(id: ID!, set: SetPokemonFields!): Pokemon
+}

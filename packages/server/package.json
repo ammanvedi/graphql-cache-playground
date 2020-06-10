@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "codegen": "graphql-codegen",
+    "post-build": "cp src/schema.graphql build",
+    "build": "tsc && npm run post-build",
+    "start": "npm run build && cd ./build && node index.js"
+  },
+  "author": "amman.vedi@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "@graphql-codegen/cli": "^1.15.2",
+    "@graphql-codegen/typescript": "^1.15.2",
+    "@graphql-codegen/typescript-resolvers": "^1.15.2",
+    "@graphql-tools/graphql-file-loader": "^6.0.9",
+    "@graphql-tools/load": "^6.0.9",
+    "@graphql-tools/schema": "^6.0.9",
+    "apollo-server": "^2.14.3"
+  },
+  "devDependencies": {
+    "@types/graphql": "^14.5.0",
+    "@types/node": "^14.0.13"
+  }
+}
