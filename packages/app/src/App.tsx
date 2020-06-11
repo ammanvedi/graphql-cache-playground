@@ -1,13 +1,23 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import {ApolloClient, ApolloProvider, HttpLink, InMemoryCache} from '@apollo/client';
+import {ApolloClient, ApolloProvider, defaultDataIdFromObject, HttpLink, InMemoryCache} from '@apollo/client';
 import {CacheView} from "./component/cache-view/CacheView";
 import {possibleTypes} from "./graphql/possibleTypes";
+import {KeyFieldsFunction} from "@apollo/client/cache/inmemory/policies";
+
+const dataIdFromObject: KeyFieldsFunction = (object, ctx) => {
+  switch(object.__typename) {
+    case "Pokedex":
+      return "Pokedex";
+  }
+
+  return defaultDataIdFromObject(object, ctx)
+}
 
 const client = new ApolloClient({
   connectToDevTools: true,
-  cache: new InMemoryCache({possibleTypes}),
+  cache: new InMemoryCache({possibleTypes, dataIdFromObject}),
   link: new HttpLink({
     uri: 'http://localhost:4000',
   })
@@ -18,22 +28,6 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <CacheView/>
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
     </ApolloProvider>
   );
 }

@@ -70,6 +70,14 @@ input SetPokemonFields {
     hp: Int
 }
 
+input CreatePokemonFields {
+    name: String!
+    type: [PokemonType!]!
+    hp: Int!
+}
+
 type Mutation {
+    addPokemon(pokemon: CreatePokemonFields!): Pokemon
     updatePokemon(id: ID!, set: SetPokemonFields!): Pokemon
+    updatePokedexLastSeenPokemon(id: ID!): Pokedex
 }

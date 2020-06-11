@@ -94,15 +94,33 @@ export type SetPokemonFields = {
   hp?: Maybe<Scalars['Int']>;
 };
 
+export type CreatePokemonFields = {
+  name: Scalars['String'];
+  type: Array<PokemonType>;
+  hp: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  addPokemon?: Maybe<Pokemon>;
   updatePokemon?: Maybe<Pokemon>;
+  updatePokedexLastSeenPokemon?: Maybe<Pokedex>;
+};
+
+
+export type MutationAddPokemonArgs = {
+  pokemon: CreatePokemonFields;
 };
 
 
 export type MutationUpdatePokemonArgs = {
   id: Scalars['ID'];
   set: SetPokemonFields;
+};
+
+
+export type MutationUpdatePokedexLastSeenPokemonArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -186,6 +204,7 @@ export type ResolversTypes = {
   Pokedex: ResolverTypeWrapper<Omit<Pokedex, 'items'> & { items: Array<ResolversTypes['InventoryItem']> }>;
   Query: ResolverTypeWrapper<{}>;
   SetPokemonFields: SetPokemonFields;
+  CreatePokemonFields: CreatePokemonFields;
   Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 };
@@ -208,6 +227,7 @@ export type ResolversParentTypes = {
   Pokedex: Omit<Pokedex, 'items'> & { items: Array<ResolversParentTypes['InventoryItem']> };
   Query: {};
   SetPokemonFields: SetPokemonFields;
+  CreatePokemonFields: CreatePokemonFields;
   Mutation: {};
   Boolean: Scalars['Boolean'];
 };
@@ -270,7 +290,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addPokemon?: Resolver<Maybe<ResolversTypes['Pokemon']>, ParentType, ContextType, RequireFields<MutationAddPokemonArgs, 'pokemon'>>;
   updatePokemon?: Resolver<Maybe<ResolversTypes['Pokemon']>, ParentType, ContextType, RequireFields<MutationUpdatePokemonArgs, 'id' | 'set'>>;
+  updatePokedexLastSeenPokemon?: Resolver<Maybe<ResolversTypes['Pokedex']>, ParentType, ContextType, RequireFields<MutationUpdatePokedexLastSeenPokemonArgs, 'id'>>;
 };
 
 export type Resolvers<ContextType = any> = {

@@ -1,7 +1,7 @@
 import { loadSchemaSync } from '@graphql-tools/load';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import {join} from 'path';
-import {Resolvers} from "./types";
+import {Pokemon, Resolvers} from "./types";
 import {data} from "./data";
 import {ApolloServer} from "apollo-server";
 import { addResolversToSchema } from '@graphql-tools/schema';
@@ -12,6 +12,27 @@ const dataStore = data;
 
 const resolvers: Resolvers = {
     Mutation: {
+        addPokemon: (parent, {pokemon}) => {
+            const newPokemon: Pokemon = {
+                __typename: "Pokemon",
+                id: (dataStore.pokemon.length + 1).toString(),
+                ...pokemon
+            }
+
+            dataStore.pokemon = [...dataStore.pokemon, newPokemon];
+
+            return newPokemon;
+        },
+        updatePokedexLastSeenPokemon: (parent, {id}) => {
+            const pokemon = dataStore.pokemon.find(p => p.id === id);
+            if (!pokemon) {
+                throw new Error(`Could not find pokemon with id ${id}`)
+            }
+
+            dataStore.pokedex.lastSeenPokemon = pokemon;
+
+            return dataStore.pokedex;
+        },
         updatePokemon: (parent, {set, id}) => {
             for(let i = 0; i < dataStore.pokemon.length; i++) {
                 const p = dataStore.pokemon[i];

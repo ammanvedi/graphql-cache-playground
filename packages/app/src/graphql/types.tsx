@@ -95,15 +95,33 @@ export type SetPokemonFields = {
   hp?: Maybe<Scalars['Int']>;
 };
 
+export type CreatePokemonFields = {
+  name: Scalars['String'];
+  type: Array<PokemonType>;
+  hp: Scalars['Int'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  addPokemon?: Maybe<Pokemon>;
   updatePokemon?: Maybe<Pokemon>;
+  updatePokedexLastSeenPokemon?: Maybe<Pokedex>;
+};
+
+
+export type MutationAddPokemonArgs = {
+  pokemon: CreatePokemonFields;
 };
 
 
 export type MutationUpdatePokemonArgs = {
   id: Scalars['ID'];
   set: SetPokemonFields;
+};
+
+
+export type MutationUpdatePokedexLastSeenPokemonArgs = {
+  id: Scalars['ID'];
 };
 
 export type PokemonFragmentFragment = (
@@ -120,6 +138,35 @@ export type UpdatePokemonMutationVariables = Exact<{
 export type UpdatePokemonMutation = (
   { __typename?: 'Mutation' }
   & { updatePokemon?: Maybe<(
+    { __typename?: 'Pokemon' }
+    & PokemonFragmentFragment
+  )> }
+);
+
+export type UpdatePokedexLastSeenMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type UpdatePokedexLastSeenMutation = (
+  { __typename?: 'Mutation' }
+  & { updatePokedexLastSeenPokemon?: Maybe<(
+    { __typename?: 'Pokedex' }
+    & { lastSeenPokemon?: Maybe<(
+      { __typename?: 'Pokemon' }
+      & Pick<Pokemon, 'id'>
+    )> }
+  )> }
+);
+
+export type AddPokemonMutationVariables = Exact<{
+  newPokemon: CreatePokemonFields;
+}>;
+
+
+export type AddPokemonMutation = (
+  { __typename?: 'Mutation' }
+  & { addPokemon?: Maybe<(
     { __typename?: 'Pokemon' }
     & PokemonFragmentFragment
   )> }
@@ -214,6 +261,72 @@ export function useUpdatePokemonMutation(baseOptions?: ApolloReactHooks.Mutation
 export type UpdatePokemonMutationHookResult = ReturnType<typeof useUpdatePokemonMutation>;
 export type UpdatePokemonMutationResult = ApolloReactCommon.MutationResult<UpdatePokemonMutation>;
 export type UpdatePokemonMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdatePokemonMutation, UpdatePokemonMutationVariables>;
+export const UpdatePokedexLastSeenDocument = gql`
+    mutation UpdatePokedexLastSeen($id: ID!) {
+  updatePokedexLastSeenPokemon(id: $id) {
+    lastSeenPokemon {
+      id
+    }
+  }
+}
+    `;
+export type UpdatePokedexLastSeenMutationFn = ApolloReactCommon.MutationFunction<UpdatePokedexLastSeenMutation, UpdatePokedexLastSeenMutationVariables>;
+
+/**
+ * __useUpdatePokedexLastSeenMutation__
+ *
+ * To run a mutation, you first call `useUpdatePokedexLastSeenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePokedexLastSeenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updatePokedexLastSeenMutation, { data, loading, error }] = useUpdatePokedexLastSeenMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUpdatePokedexLastSeenMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdatePokedexLastSeenMutation, UpdatePokedexLastSeenMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdatePokedexLastSeenMutation, UpdatePokedexLastSeenMutationVariables>(UpdatePokedexLastSeenDocument, baseOptions);
+      }
+export type UpdatePokedexLastSeenMutationHookResult = ReturnType<typeof useUpdatePokedexLastSeenMutation>;
+export type UpdatePokedexLastSeenMutationResult = ApolloReactCommon.MutationResult<UpdatePokedexLastSeenMutation>;
+export type UpdatePokedexLastSeenMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdatePokedexLastSeenMutation, UpdatePokedexLastSeenMutationVariables>;
+export const AddPokemonDocument = gql`
+    mutation AddPokemon($newPokemon: CreatePokemonFields!) {
+  addPokemon(pokemon: $newPokemon) {
+    ...PokemonFragment
+  }
+}
+    ${PokemonFragmentFragmentDoc}`;
+export type AddPokemonMutationFn = ApolloReactCommon.MutationFunction<AddPokemonMutation, AddPokemonMutationVariables>;
+
+/**
+ * __useAddPokemonMutation__
+ *
+ * To run a mutation, you first call `useAddPokemonMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddPokemonMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addPokemonMutation, { data, loading, error }] = useAddPokemonMutation({
+ *   variables: {
+ *      newPokemon: // value for 'newPokemon'
+ *   },
+ * });
+ */
+export function useAddPokemonMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddPokemonMutation, AddPokemonMutationVariables>) {
+        return ApolloReactHooks.useMutation<AddPokemonMutation, AddPokemonMutationVariables>(AddPokemonDocument, baseOptions);
+      }
+export type AddPokemonMutationHookResult = ReturnType<typeof useAddPokemonMutation>;
+export type AddPokemonMutationResult = ApolloReactCommon.MutationResult<AddPokemonMutation>;
+export type AddPokemonMutationOptions = ApolloReactCommon.BaseMutationOptions<AddPokemonMutation, AddPokemonMutationVariables>;
 export const PokemonDocument = gql`
     query Pokemon($type: PokemonType) {
   pokemon(type: $type) {
