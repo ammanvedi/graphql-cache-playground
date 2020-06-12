@@ -105,7 +105,7 @@ export const cacheToGraph = (
 
     Object.keys(cacheObject).forEach(key => {
         const child = cacheObject[key]
-        if(isLeaf(child) && !showLeaves) {
+        if((isLeaf(child) && !showLeaves) || (isLeaf(child) && key === '__typename')) {
             return;
         }
         cacheToGraph(child, graph, cacheObject, `${objectPath}${PATH_DELIM}${key}`, objectPath, showLeaves)
