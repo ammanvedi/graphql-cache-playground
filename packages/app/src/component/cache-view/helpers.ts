@@ -66,7 +66,8 @@ export const cacheToGraph = (
     graph: DirectedGraph,
     parent: { [key: string]: any } | null,
     objectPath: string = '',
-    parentPath: string = ''
+    parentPath: string = '',
+    showLeaves: boolean = false
 ): void => {
     const { nodes, edges } = graph;
 
@@ -75,6 +76,7 @@ export const cacheToGraph = (
         || parent?.__typename === QUERY
         || Array.isArray(cacheObject)
         || cacheObject.__ref
+        || isLeaf(cacheObject)
     ) {
         nodes.set(objectPath, {
             id: objectPath,
@@ -88,6 +90,9 @@ export const cacheToGraph = (
                 to: parentPath
             })
         }
+        if (isLeaf(cacheObject)) {
+            return;
+        }
     }
 
     if(cacheObject.__ref) {
@@ -100,9 +105,10 @@ export const cacheToGraph = (
 
     Object.keys(cacheObject).forEach(key => {
         const child = cacheObject[key]
-        if (!isLeaf(child)) {
-            cacheToGraph(child, graph, cacheObject, `${objectPath}${PATH_DELIM}${key}`, objectPath)
+        if(isLeaf(child) && !showLeaves) {
+            return;
         }
+        cacheToGraph(child, graph, cacheObject, `${objectPath}${PATH_DELIM}${key}`, objectPath, showLeaves)
     })
 }
 
