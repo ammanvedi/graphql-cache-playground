@@ -126,7 +126,7 @@ export type MutationUpdatePokedexLastSeenPokemonArgs = {
 
 export type PokemonFragmentFragment = (
   { __typename?: 'Pokemon' }
-  & Pick<Pokemon, 'id' | 'name' | 'type' | 'hp'>
+  & Pick<Pokemon, 'name' | 'type' | 'hp'>
 );
 
 export type UpdatePokemonMutationVariables = Exact<{
@@ -206,23 +206,15 @@ export type PokedexQuery = (
   { __typename?: 'Query' }
   & { pokedex?: Maybe<(
     { __typename?: 'Pokedex' }
-    & Pick<Pokedex, 'totalSeenPokemon'>
     & { lastSeenPokemon?: Maybe<(
       { __typename?: 'Pokemon' }
       & PokemonFragmentFragment
-    )>, items: Array<(
-      { __typename?: 'Pokeball' }
-      & Pick<Pokeball, 'id' | 'name' | 'count' | 'ballType'>
-    ) | (
-      { __typename?: 'Potion' }
-      & Pick<Potion, 'id' | 'name' | 'potionType'>
     )> }
   )> }
 );
 
 export const PokemonFragmentFragmentDoc = gql`
     fragment PokemonFragment on Pokemon {
-  id
   name
   type
   hp
@@ -407,20 +399,6 @@ export const PokedexDocument = gql`
   pokedex {
     lastSeenPokemon {
       ...PokemonFragment
-    }
-    totalSeenPokemon
-    items {
-      ... on Node {
-        id
-        name
-      }
-      ... on Pokeball {
-        count
-        ballType
-      }
-      ... on Potion {
-        potionType
-      }
     }
   }
 }

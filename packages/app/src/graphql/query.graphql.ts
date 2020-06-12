@@ -35,20 +35,6 @@ export const pokedexQuery = gql`
             lastSeenPokemon {
                 ...PokemonFragment
             }
-            totalSeenPokemon
-            items {
-                ... on Node {
-                    id
-                    name
-                }
-                ... on Pokeball {
-                    count
-                    ballType
-                }
-                ... on Potion {
-                    potionType
-                }
-            }
         }
     }
 `
