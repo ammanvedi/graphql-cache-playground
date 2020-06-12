@@ -126,7 +126,7 @@ export type MutationUpdatePokedexLastSeenPokemonArgs = {
 
 export type PokemonFragmentFragment = (
   { __typename?: 'Pokemon' }
-  & Pick<Pokemon, 'name' | 'type' | 'hp'>
+  & Pick<Pokemon, 'id' | 'name' | 'type' | 'hp'>
 );
 
 export type UpdatePokemonMutationVariables = Exact<{
@@ -222,6 +222,7 @@ export type PokedexQuery = (
 
 export const PokemonFragmentFragmentDoc = gql`
     fragment PokemonFragment on Pokemon {
+  id
   name
   type
   hp
