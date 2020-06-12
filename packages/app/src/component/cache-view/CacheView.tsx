@@ -60,7 +60,7 @@ export const CacheView = () => {
         edges: [],
     }
 
-    cacheToGraph(cache, graph, null)
+    cacheToGraph(cache, graph, null, "", "", true)
 
     useEffect(() => {
         if (!forceGraph.current || !graphContainerEl.current) {
