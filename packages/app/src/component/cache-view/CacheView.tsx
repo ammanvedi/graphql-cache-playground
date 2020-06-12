@@ -5,7 +5,7 @@ import {
     useCharactersQuery,
     usePokedexQuery,
     usePokemonQuery,
-    useUpdatePokedexLastSeenMutation,
+    useUpdatePokedexLastSeenMutation, useUpdatePokemonMutation,
 } from '../../graphql/types'
 import { useApolloClient } from '@apollo/client'
 import {
@@ -47,48 +47,55 @@ export const CacheView = () => {
 
     const pokemonVars = { type: PokemonType.Electric }
 
-    const { data: pokedexData } = usePokedexQuery()
+    // const { data: pokedexData } = usePokedexQuery()
     const { data: pokemonData } = usePokemonQuery({
         variables: pokemonVars,
     })
-    const { data: characterData } = useCharactersQuery()
-
-    const [addPokemon, { loading: addPokemonLoading }] = useAddPokemonMutation({
+    const [updatePokemon, {loading: updatePokemonLoading}] = useUpdatePokemonMutation({
         variables: {
-            newPokemon: {
-                name: 'Raichu',
-                hp: 10000,
-                type: [PokemonType.Electric],
-            },
-        },
-        update: (store, { data }) => {
-            if (data?.addPokemon) {
-                const currentCharacterList = store.readQuery<CharactersQuery>({
-                    query: charactersQuery,
-                })
-                console.log(currentCharacterList)
-                const newData = {
-                    ...currentCharacterList,
-                    characters: [
-                        ...((currentCharacterList || {}).characters || []),
-                        data.addPokemon,
-                    ],
-                }
-                store.writeQuery({
-                    query: charactersQuery,
-                    data: newData,
-                })
+            id: "3",
+            set: {
+                hp: 213123
             }
-        },
-        refetchQueries: [{ query: pokemonQuery, variables: pokemonVars }],
+        }
     })
+    // const { data: characterData } = useCharactersQuery()
 
-    const [
-        updatePokedex,
-        { loading: updatePokedexLoading },
-    ] = useUpdatePokedexLastSeenMutation({
-        variables: { id: '3' },
-    })
+    // const [addPokemon, { loading: addPokemonLoading }] = useAddPokemonMutation({
+    //     variables: {
+    //         newPokemon: {
+    //             name: 'Raichu',
+    //             hp: 10000,
+    //             type: [PokemonType.Electric],
+    //         },
+    //     },
+    //     update: (store, { data }) => {
+    //         if (data?.addPokemon) {
+    //             const currentCharacterList = store.readQuery<CharactersQuery>({
+    //                 query: charactersQuery,
+    //             })
+    //             const newData = {
+    //                 ...currentCharacterList,
+    //                 characters: [
+    //                     ...((currentCharacterList || {}).characters || []),
+    //                     data.addPokemon,
+    //                 ],
+    //             }
+    //             store.writeQuery({
+    //                 query: charactersQuery,
+    //                 data: newData,
+    //             })
+    //         }
+    //     },
+    //     refetchQueries: [{ query: pokemonQuery, variables: pokemonVars }],
+    // })
+
+    // const [
+    //     updatePokedex,
+    //     { loading: updatePokedexLoading },
+    // ] = useUpdatePokedexLastSeenMutation({
+    //     variables: { id: '3' },
+    // })
 
     const client = useApolloClient()
 
@@ -99,7 +106,7 @@ export const CacheView = () => {
         edges: [],
     }
 
-    cacheToGraph(cache, graph, null)
+    cacheToGraph(cache, graph, null, "", "", true)
 
     useEffect(() => {
         if (!forceGraph.current || !graphContainerEl.current) {
@@ -154,11 +161,12 @@ export const CacheView = () => {
                 ctx.fillText(label, node.x, node.y)
             })
     }, [
-        pokedexData,
+        // pokedexData,
         pokemonData,
-        characterData,
-        addPokemonLoading,
-        updatePokedexLoading,
+        updatePokemonLoading
+        // characterData,
+        // addPokemonLoading,
+        // updatePokedexLoading,
     ])
 
     return (
@@ -208,10 +216,11 @@ export const CacheView = () => {
                     textAlign: 'right'
                 }}
             >
-                <button style={btnStyle} onClick={() => updatePokedex()}>
-                    Update last seen pokemon in pokedex
-                </button>
-                <button style={btnStyle} onClick={() => addPokemon()}>Add raichu</button>
+                {/*<button style={btnStyle} onClick={() => updatePokedex()}>*/}
+                {/*    Update last seen pokemon in pokedex*/}
+                {/*</button>*/}
+                {/*<button style={btnStyle} onClick={() => addPokemon()}>Add raichu</button>*/}
+                <button style={btnStyle} onClick={() => updatePokemon()}>Update Pokemon 3</button>
             </div>
         </Fragment>
     )
