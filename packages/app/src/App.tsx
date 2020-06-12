@@ -6,18 +6,18 @@ import {CacheView} from "./component/cache-view/CacheView";
 import {possibleTypes} from "./graphql/possibleTypes";
 import {KeyFieldsFunction} from "@apollo/client/cache/inmemory/policies";
 
-const dataIdFromObject: KeyFieldsFunction = (object, ctx) => {
-  switch(object.__typename) {
-    case "Pokedex":
-      return "Pokedex";
-  }
-
-  return defaultDataIdFromObject(object, ctx)
-}
+// const dataIdFromObject: KeyFieldsFunction = (object, ctx) => {
+//   switch(object.__typename) {
+//     case "Pokedex":
+//       return "Pokedex";
+//   }
+//
+//   return defaultDataIdFromObject(object, ctx)
+// }
 
 const client = new ApolloClient({
   connectToDevTools: true,
-  cache: new InMemoryCache({possibleTypes, dataIdFromObject}),
+  cache: new InMemoryCache({possibleTypes,}),
   link: new HttpLink({
     uri: 'http://localhost:4000',
   })
