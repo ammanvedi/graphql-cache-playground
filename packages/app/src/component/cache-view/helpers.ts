@@ -28,12 +28,13 @@ export type DirectedGraph = {
 }
 
 const QUERY = 'Query';
+const ROOT_QUERY = 'ROOT_QUERY';
+const ROOT_MUTATION = 'ROOT_MUTATION';
 export const PATH_DELIM = '>>>'
 
 const isLeaf = (o: any) => typeof o !== 'object'
 
 export const deriveNodeDisplayName = (o: { [key: string]: any }, path: string): string => {
-    console.log(o, path)
     if (o.__typename && o.id) {
         return `${o.__typename}:${o.id}`;
     }
@@ -41,12 +42,13 @@ export const deriveNodeDisplayName = (o: { [key: string]: any }, path: string): 
     return path;
 }
 
-export const deriveNodeType = (cacheObject: { [key: string]: any }, parent: { [key: string]: any } | null): NodeType => {
-    if(!parent) {
+export const deriveNodeType = (cacheObject: { [key: string]: any }, parent: { [key: string]: any } | null, path: string): NodeType => {
+
+    if(path === `${PATH_DELIM}${ROOT_QUERY}` || path === `${PATH_DELIM}${ROOT_MUTATION}`) {
         return NodeType.ROOT_QUERY
     }
 
-    if (parent.__typename === QUERY) {
+    if (parent?.__typename === QUERY) {
         return NodeType.OPERATION
     }
 
@@ -82,7 +84,7 @@ export const cacheToGraph = (
             id: objectPath,
             name: deriveNodeDisplayName(cacheObject, objectPath),
             meta: cacheObject,
-            type: deriveNodeType(cacheObject, parent)
+            type: deriveNodeType(cacheObject, parent, objectPath)
         });
         if (parentPath) {
             edges.push({
