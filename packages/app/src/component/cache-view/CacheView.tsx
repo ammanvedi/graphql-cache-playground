@@ -8,10 +8,38 @@ import {
     useUpdatePokedexLastSeenMutation,
 } from '../../graphql/types'
 import { useApolloClient } from '@apollo/client'
-import { cacheToGraph, DirectedGraph, graphToForceGraph, Node } from './helpers'
+import {
+    cacheToGraph,
+    DirectedGraph,
+    graphToForceGraph,
+    Node,
+    NodeType,
+    PATH_DELIM,
+} from './helpers'
 import React, { Fragment, useEffect, useRef } from 'react'
 import ForceGraph, { ForceGraphInstance } from 'force-graph'
-import {charactersQuery, pokemonQuery} from '../../graphql/query.graphql'
+import { charactersQuery, pokemonQuery } from '../../graphql/query.graphql'
+
+const btnStyle = {
+    marginBottom: 10
+}
+
+const NodeColors = {
+    [NodeType.REF]: 'orange',
+    [NodeType.CONCRETE_TYPE]: 'red',
+    [NodeType.FIELD]: 'blue',
+    [NodeType.OPERATION]: 'darkgreen',
+    [NodeType.ROOT_QUERY]: 'pink',
+    default: '#000',
+}
+
+const NodeLegend = {
+    [NodeType.REF]: 'Reference Link',
+    [NodeType.CONCRETE_TYPE]: 'Typed Object',
+    [NodeType.FIELD]: 'Object Field',
+    [NodeType.OPERATION]: 'GraphQL Operation',
+    [NodeType.ROOT_QUERY]: 'ROOT Query',
+}
 
 export const CacheView = () => {
     const graphContainerEl = useRef<HTMLDivElement>(null)
@@ -52,7 +80,7 @@ export const CacheView = () => {
                 })
             }
         },
-        refetchQueries: [{query: pokemonQuery, variables: pokemonVars}]
+        refetchQueries: [{ query: pokemonQuery, variables: pokemonVars }],
     })
 
     const [
@@ -66,8 +94,6 @@ export const CacheView = () => {
 
     const cache = client.cache.extract(false)
 
-    console.log('c', client.cache.extract(false))
-
     const graph: DirectedGraph = {
         nodes: new Map<string, Node>(),
         edges: [],
@@ -75,16 +101,16 @@ export const CacheView = () => {
 
     cacheToGraph(cache, graph, null)
 
-    console.log('g', graph)
-
     useEffect(() => {
         if (!forceGraph.current || !graphContainerEl.current) {
             return
         }
         const renderGraph = graphToForceGraph(graph)
-        //console.log('rg', renderGraph)
         forceGraph
             .current(graphContainerEl.current)
+            .backgroundColor('#000')
+            .linkColor(() => '#fff')
+            .linkWidth(() => 3)
             .graphData(renderGraph)
             .nodeCanvasObject((node, ctx, globalScale) => {
                 if (node.x == null || node.y == null) {
@@ -92,15 +118,20 @@ export const CacheView = () => {
                 }
 
                 // @ts-ignore
-                const label = node.name as string
-                const fontSize = 12 / globalScale
-                ctx.font = `${fontSize}px Sans-Serif`
+                const nodePath = node.name.split(PATH_DELIM)
+                const shortName = nodePath[nodePath.length - 1]
+
+                // @ts-ignore
+                const label = shortName
+                const fontSize = 15 / globalScale
+                ctx.font = `bold ${fontSize}px Sans-Serif`
                 const textWidth = ctx.measureText(label).width
                 const bckgDimensions = [textWidth, fontSize].map(
                     n => n + fontSize * 0.2
                 ) // some padding
 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+                // @ts-ignore
+                ctx.fillStyle = NodeColors[node.type] || NodeColors.default
 
                 ctx.fillRect(
                     node.x - bckgDimensions[0] / 2,
@@ -116,7 +147,8 @@ export const CacheView = () => {
                     // @ts-ignore
                     ctx.fillStyle = node.color
                 } else {
-                    ctx.fillStyle = '#000'
+                    // @ts-ignore
+                    ctx.fillStyle = '#fff'
                 }
 
                 ctx.fillText(label, node.x, node.y)
@@ -131,11 +163,56 @@ export const CacheView = () => {
 
     return (
         <Fragment>
-            <button onClick={() => updatePokedex()}>
-                Update last seen pokemon in pokedex
-            </button>
-            <button onClick={() => addPokemon()}>Add raichu</button>
+
+
             <div ref={graphContainerEl} />
+            <ul
+                style={{
+                    listStyleType: 'none',
+                    position: 'fixed',
+                    bottom: 20,
+                    left: 20,
+                    color: '#fff',
+                }}
+            >
+                {Object.keys(NodeLegend).map(type => {
+                    // @ts-ignore
+                    const legendName = NodeLegend[type]
+                    // @ts-ignore
+                    const color = NodeColors[type]
+
+                    return (
+                        <li style={{ marginBottom: 10 }}>
+                            <span
+                                style={{
+                                    marginRight: 10,
+                                    verticalAlign: 'middle',
+                                    width: 20,
+                                    height: 20,
+                                    display: 'inline-block',
+                                    backgroundColor: color,
+                                }}
+                            />
+                            <span>{legendName}</span>
+                        </li>
+                    )
+                })}
+            </ul>
+            <div
+                style={{
+                    listStyleType: 'none',
+                    position: 'fixed',
+                    bottom: 20,
+                    right: 20,
+                    width: 300,
+                    textAlign: 'right'
+                }}
+            >
+                <button style={btnStyle} onClick={() => updatePokedex()}>
+                    Update last seen pokemon in pokedex
+                </button>
+                <button style={btnStyle} onClick={() => addPokemon()}>Add raichu</button>
+            </div>
         </Fragment>
     )
 }

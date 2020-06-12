@@ -2,9 +2,18 @@ import { GraphData } from 'force-graph'
 
 type NodeID = string
 
+export enum NodeType {
+    ROOT_QUERY,
+    OPERATION,
+    CONCRETE_TYPE,
+    FIELD,
+    REF
+}
+
 export type Node = {
     id: string
     name: string
+    type: NodeType
     meta: object
 }
 
@@ -18,25 +27,38 @@ export type DirectedGraph = {
     edges: Array<Edge>
 }
 
-const isConcreteTypedObject = (obj: any): boolean =>
-    typeof obj === 'object' && !!obj.__typename
-
-const isReferenceObject = (obj: any): boolean =>
-    typeof obj === 'object' && !!obj.__ref
-
-const ROOT_QUERY = 'ROOT_QUERY'
-const TYPE_NAME = '__typename'
-const REF = '__ref'
 const QUERY = 'Query';
+export const PATH_DELIM = '>>>'
 
 const isLeaf = (o: any) => typeof o !== 'object'
 
 export const deriveNodeDisplayName = (o: { [key: string]: any }, path: string): string => {
+    console.log(o, path)
     if (o.__typename && o.id) {
         return `${o.__typename}:${o.id}`;
     }
 
     return path;
+}
+
+export const deriveNodeType = (cacheObject: { [key: string]: any }, parent: { [key: string]: any } | null): NodeType => {
+    if(!parent) {
+        return NodeType.ROOT_QUERY
+    }
+
+    if (parent.__typename === QUERY) {
+        return NodeType.OPERATION
+    }
+
+    if (cacheObject.__typename) {
+        return NodeType.CONCRETE_TYPE
+    }
+
+    if (cacheObject.__ref) {
+        return NodeType.REF
+    }
+
+    return NodeType.FIELD
 }
 
 export const cacheToGraph = (
@@ -47,10 +69,7 @@ export const cacheToGraph = (
     parentPath: string = ''
 ): void => {
     const { nodes, edges } = graph;
-    console.log(objectPath)
 
-    // nodes for all concrete type objects
-    // nodes for all top level queries
     if(
         cacheObject.__typename
         || parent?.__typename === QUERY
@@ -60,7 +79,8 @@ export const cacheToGraph = (
         nodes.set(objectPath, {
             id: objectPath,
             name: deriveNodeDisplayName(cacheObject, objectPath),
-            meta: cacheObject
+            meta: cacheObject,
+            type: deriveNodeType(cacheObject, parent)
         });
         if (parentPath) {
             edges.push({
@@ -73,7 +93,7 @@ export const cacheToGraph = (
     if(cacheObject.__ref) {
         edges.push({
             from: objectPath,
-            to: `:${cacheObject.__ref}`
+            to: `${PATH_DELIM}${cacheObject.__ref}`
         })
     }
 
@@ -81,14 +101,14 @@ export const cacheToGraph = (
     Object.keys(cacheObject).forEach(key => {
         const child = cacheObject[key]
         if (!isLeaf(child)) {
-            cacheToGraph(child, graph, cacheObject, `${objectPath}:${key}`, objectPath)
+            cacheToGraph(child, graph, cacheObject, `${objectPath}${PATH_DELIM}${key}`, objectPath)
         }
     })
 }
 
 export const graphToForceGraph = (graph: DirectedGraph): GraphData => {
     return {
-        nodes: Array.from(graph.nodes.entries()).map(([id, {name}]) => ({ id, name })),
+        nodes: Array.from(graph.nodes.entries()).map(([id, {name, type}]) => ({ id, name, type })),
         links: graph.edges.map(e => ({ source: e.from, target: e.to })),
     }
 }
