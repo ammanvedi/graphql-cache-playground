@@ -99,6 +99,10 @@ export const CacheView = () => {
 
     const client = useApolloClient()
 
+    console.log(client.cache.extract())
+
+
+
     const cache = client.cache.extract(false)
 
     const graph: DirectedGraph = {
@@ -106,7 +110,7 @@ export const CacheView = () => {
         edges: [],
     }
 
-    cacheToGraph(cache, graph, null, "", "", false)
+    cacheToGraph(cache, graph, null, "", "", true)
 
     useEffect(() => {
         if (!forceGraph.current || !graphContainerEl.current) {
