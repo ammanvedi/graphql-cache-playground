@@ -206,6 +206,7 @@ export type PokedexQuery = (
   { __typename?: 'Query' }
   & { pokedex?: Maybe<(
     { __typename?: 'Pokedex' }
+    & Pick<Pokedex, 'totalSeenPokemon'>
     & { lastSeenPokemon?: Maybe<(
       { __typename?: 'Pokemon' }
       & PokemonFragmentFragment
@@ -397,6 +398,7 @@ export type CharactersQueryResult = ApolloReactCommon.QueryResult<CharactersQuer
 export const PokedexDocument = gql`
     query Pokedex {
   pokedex {
+    totalSeenPokemon
     lastSeenPokemon {
       ...PokemonFragment
     }

@@ -32,6 +32,7 @@ export const pokedexQuery = gql`
     ${PokemonFragment}
     query Pokedex {
         pokedex {
+            totalSeenPokemon
             lastSeenPokemon {
                 ...PokemonFragment
             }
