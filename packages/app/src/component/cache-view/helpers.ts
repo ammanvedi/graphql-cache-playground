@@ -32,7 +32,10 @@ const ROOT_QUERY = 'ROOT_QUERY';
 const ROOT_MUTATION = 'ROOT_MUTATION';
 export const PATH_DELIM = '>>>'
 
-const isLeaf = (o: any) => typeof o !== 'object'
+const isLeaf = (o: any) => {
+    console.log(o, typeof o)
+    return typeof o !== 'object'
+}
 
 export const deriveNodeDisplayName = (o: { [key: string]: any }, path: string): string => {
     if (o.__typename && o.id) {
@@ -107,10 +110,17 @@ export const cacheToGraph = (
 
     Object.keys(cacheObject).forEach(key => {
         const child = cacheObject[key]
-        if((isLeaf(child) && !showLeaves) || (isLeaf(child) && key === '__typename')) {
+        if (key === '__ref') {
             return;
         }
-        cacheToGraph(child, graph, cacheObject, `${objectPath}${PATH_DELIM}${key}`, objectPath, showLeaves)
+        const childIsLeaf = isLeaf(child);
+        if( (childIsLeaf && !showLeaves) || (childIsLeaf && key === '__typename')) {
+            return;
+        }
+
+        const displayKey = childIsLeaf ? `${key}=${child}` : Array.isArray(cacheObject) ? `array[${key}]` : key;
+
+        cacheToGraph(child, graph, cacheObject, `${objectPath}${PATH_DELIM}${displayKey}`, objectPath, showLeaves)
     })
 }
 
