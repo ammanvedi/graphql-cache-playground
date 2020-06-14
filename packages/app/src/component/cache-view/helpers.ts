@@ -51,16 +51,16 @@ export const deriveNodeType = (cacheObject: { [key: string]: any }, parent: { [k
         return NodeType.ROOT_QUERY
     }
 
+    if (cacheObject.__ref) {
+        return NodeType.REF
+    }
+
     if (parent?.__typename === QUERY) {
         return NodeType.OPERATION
     }
 
     if (cacheObject.__typename) {
         return NodeType.CONCRETE_TYPE
-    }
-
-    if (cacheObject.__ref) {
-        return NodeType.REF
     }
 
     return NodeType.FIELD
